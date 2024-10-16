@@ -24,6 +24,8 @@ export class BotService implements OnModuleInit {
 
     const webAppUrl = 'https://inside360.ru'
 
+    
+
 
     await this.botCommands(bot, commands);
     await this.botMessage(bot);
@@ -33,6 +35,22 @@ export class BotService implements OnModuleInit {
   // метод класса
   async botMessage(options) {
     this.bot = options
+
+    const keyboard = [[
+      { text: '⭐️ Информация о компании', callback_data: 'info' },
+      { text: '⭐️ Услуги компании', callback_data: 'services' },
+        ],
+      [
+        { text: 'Перейти на наш сайт', callback_data: 'inside360'},
+      ],
+      [
+        { text: '⭐️ Кейсы', callback_data: 'cases' },
+        { text: '⭐️ Наши контакты', callback_data: 'contact' },
+      ],
+      [
+        { text: '❌ Закрыть меню', callback_data: 'close' },
+      ],
+  ]
 
     // Обработка команды /start
     try {
@@ -59,10 +77,8 @@ export class BotService implements OnModuleInit {
           }
 
             setTimeout( async () => {
-              await this.bot.sendMessage(chatId, `Приветствую тебя, ${firstName}! Я - бот компании INSIDE360, чем могу быть тебе полезен?`);
+              await this.bot.sendMessage(chatId, `Приветствую тебя, ${firstName}! Рады приветствовать вас! 🤝 Я бот от Inside360, экспертов в digital-маркетинге.  Хотите узнать о наших услугах, почитать кейсы или задать вопрос?` );
             }, 4000)
-
-            console.log(msg);
           
           }
           else if(msg.text == '/ref') {
@@ -80,22 +96,7 @@ export class BotService implements OnModuleInit {
         
           await this.bot.sendMessage(chatId, 'Меню бота', {
             reply_markup: {
-              inline_keyboard: [
-                [
-                  { text: '⭐️ Информация о компании', callback_data: 'info' },
-                  { text: '⭐️ Услуги компании', callback_data: 'services' },
-                ],
-                [
-                  { text: 'Перейти на наш сайт', callback_data: 'inside360'},
-                ],
-                [
-                  { text: '⭐️ Кейсы', callback_data: 'cases' },
-                  { text: '⭐️ Форма обратной связи', callback_data: 'contact' },
-                ],
-                [
-                  { text: '❌ Закрыть меню', callback_data: 'close' },
-                ],
-              ],
+              inline_keyboard: keyboard
             },
           });
         } else if(msg.text == '❌ Закрыть меню') {
@@ -104,35 +105,17 @@ export class BotService implements OnModuleInit {
       
               reply_markup: {
       
-                  remove_keyboard: true
+                  remove_keyboard: false
       
               }
-      
           })
-      
       }
-          else {
-            await this.bot.sendMessage(chatId, msg.text)
-          }
 
         })
-
         
       } catch(error) {
         console.log(error);
       }
-
-    // Обработка обычных сообщений
-    this.bot.on('message', async (msg) => {
-      const chatId = msg.chat.id;
-      const text = msg.text; 
-
-      // Добавьте логику для обработки сообщения
-      console.log('Получено сообщение:', text);
-
-      // Отправка ответа на сообщение (если нужно)
-      await this.bot.sendMessage(chatId, 'Ты написал: ' + text);
-    });
 
     // Обработка inline кнопок
     this.bot.on('callback_query', async (query) => {
@@ -144,9 +127,7 @@ export class BotService implements OnModuleInit {
 
         await this.bot.sendMessage(chatId, 'Вы выбрали Инфо', {
            reply_markup: {
-
                 remove_keyboard: true
-    
             }
 
         })
@@ -172,10 +153,10 @@ export class BotService implements OnModuleInit {
           })
           
       } else if (data == 'inside360') {
-          await this.bot.sendMessage(chatId, 'Заполните форму: ', {
+          await this.bot.sendMessage(chatId, 'Переход на наш сайт: ', {
             reply_markup: {
               inline_keyboard: [
-                [{text: 'Перейти на сайт', web_app: { url: webAppUrl}}]
+                [{text: webAppUrl, web_app: { url: webAppUrl}}]
               ]
             }
           })
@@ -191,14 +172,13 @@ export class BotService implements OnModuleInit {
           text: 'Меню закрыто!',
           show_alert: false
         });
+        // await this.bot.deleteMessage(chatId, 1);
       }     
     });
     
 
     // Обработка ошибок
     this.bot.on("polling_error", (error) => console.log(error));
-
-
 
   }
 
@@ -213,18 +193,16 @@ export class BotService implements OnModuleInit {
   
     this.bot.onText(/\/clear/, async (msg) => {
       const chatId = msg.chat.id;
-      const messageId = msg.message_id; // ID сообщения с командой /clear
+      const messageId = msg.message_id; 
   
       try {
-        // Удаляем сообщения, начиная с сообщения с командой /clear
         for (let i = messageId; i > 0; i--) {
           await this.bot.deleteMessage(chatId, i)
             .catch(err => {
               console.error('Ошибка при удалении сообщения:', err);
-              // Продолжаем удаление, если произошла ошибка
             });
-        }
-        await this.bot.sendMessage(chatId, 'Чат очищен!');
+          }
+          // await this.bot.sendMessage(chatId, 'Чат очищен!');
       } catch (error) {
         console.error('Ошибка при очистке чата:', error);
       }
@@ -232,13 +210,3 @@ export class BotService implements OnModuleInit {
   }
   
 }
-
-
-
-  // method for adding new users in db
-  // async addNewUser(data: Prisma.User): Promise<void> {
-  //   await this.prisma.users.create({
-  //     data
-  //   })
-  // }
-

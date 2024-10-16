@@ -37,17 +37,20 @@
 $ yarn install
 ```
 
+## Building the app
+
+```bash
+# development
+$ nest build
+
+```
+
 ## Running the app
 
 ```bash
 # development
-$ yarn run start
+$ nest start
 
-# watch mode
-$ yarn run start:dev
-
-# production mode
-$ yarn run start:prod
 ```
 
 ## Test
